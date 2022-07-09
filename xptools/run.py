@@ -35,10 +35,10 @@ class Main(object):
     def main(self):
         for run_attrs in self.attrs('run'):
             self.run(run_attrs)
-            for sum_attrs in self.attrs('sum'):
-                self.summarize(run_attrs, sum_attrs)
-        for agg_attrs in self.attrs('agg'):
-            self.aggregate(agg_attrs)
+            for ext_attrs in self.attrs('ext'):
+                self.extract(run_attrs, ext_attrs)
+        for vis_attrs in self.attrs('vis'):
+            self.visualize(vis_attrs)
 
     def run(self, attrs):
         outdir = self.outdir / self.md5(attrs)
@@ -51,18 +51,18 @@ class Main(object):
             self.script.run(Namespace(outdir=outdir, **attrs))
             success_file.write_text('')
 
-    def summarize(self, run_attrs, sum_attrs):
+    def extract(self, run_attrs, ext_attrs):
         outdir = self.outdir / self.md5(run_attrs)
-        ns = Namespace(outdir=outdir, **run_attrs, **sum_attrs)
-        for label, value in self.script.summarize(ns):
+        ns = Namespace(outdir=outdir, **run_attrs, **ext_attrs)
+        for label, value in self.script.extract(ns):
             self.results.append(Result(
                 label=label, value=value,
-                **run_attrs, **sum_attrs
+                **run_attrs, **ext_attrs
             ))
 
-    def aggregate(self, attrs):
+    def visualize(self, attrs):
         ns = Namespace(outdir=self.outdir, **attrs)
-        self.script.aggregate(self.results, ns)
+        self.script.visualize(self.results, ns)
 
     def attrs(self, step):
         if dct := self.xargs.get(step):
@@ -157,7 +157,7 @@ def xargs_expand(val):
                     pass
 
 
-xargs_format = compile(r'^(run|sum|agg):(.+?)=(.+?)$')
+xargs_format = compile(r'^(run|ext|vis):(.+?)=(.+?)$')
 
 xargs_range_format = compile(r'^(\d+)\.\.(\d+)$')
 
