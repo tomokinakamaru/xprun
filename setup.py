@@ -7,7 +7,7 @@ setup(
     name=name,
     packages=find_packages(),
     entry_points=dict(console_scripts=[
-        f'{name}-fix={name}.fix:Main.entrypoint',
-        f'{name}-run={name}.run:Main.entrypoint'
+        f'xpfix={name}.fix:Main.entrypoint',
+        f'xprun={name}.run:Main.entrypoint'
     ])
 )
