@@ -75,7 +75,7 @@ class Main(object):
 
     def md5(self, dct):
         s = md5(str(sorted(dct.items())).encode()).hexdigest()
-        return f'{s[:2]}/{s[2:]}'
+        return f'{s[0]}/{s[1]}/{s[2:]}'
 
     def dump(self, dct):
         return '\n'.join(f'{k} = {v}' for k, v in sorted(dct.items()))
