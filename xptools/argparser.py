@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from argparse import HelpFormatter
-from os import get_terminal_size
+from shutil import get_terminal_size
 
 
 class ArgParser(ArgumentParser):
