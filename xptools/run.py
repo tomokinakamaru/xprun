@@ -4,6 +4,7 @@ from hashlib import md5
 from importlib.util import module_from_spec
 from importlib.util import spec_from_file_location
 from itertools import product
+from json import load
 from pathlib import Path
 from re import compile
 from shutil import rmtree
@@ -17,7 +18,7 @@ class Main(object):
 
     def __init__(self):
         self.args, unknown = parser.parse_known_args()
-        self.xargs = xargs_parse(unknown)
+        self.xargs = xargs_parse(unknown, self.args.params)
         self.results = Results()
 
     @cached_property
@@ -126,7 +127,23 @@ class Result(Namespace):
         return True
 
 
-def xargs_parse(args):
+def xargs_parse(args, path):
+    xargs1 = xargs_parse_args(args)
+    xargs2 = xargs_parse_file(path) if path else {}
+    return xargs_merge(xargs1, xargs2)
+
+
+def xargs_parse_file(path):
+    args = []
+    with open(path) as f:
+        data = load(f)
+        for step in ('run', 'ext', 'agg'):
+            for name, val in data.get(step, {}).items():
+                args.append(f'{step}:{name}={val}')
+    return xargs_parse_args(args)
+
+
+def xargs_parse_args(args):
     xargs, names = {}, {}
     for arg in args:
         if match := xargs_format.match(arg):
@@ -158,6 +175,16 @@ def xargs_expand(val):
                     pass
 
 
+def xargs_merge(*xargs):
+    result = {}
+    for x in xargs:
+        for step, dct in x.items():
+            d = result.setdefault(step, {})
+            for name, lst in dct.items():
+                d.setdefault(name, lst)
+    return result
+
+
 xargs_format = compile(r'^(run|ext|vis):(.+?)=(.+?)$')
 
 xargs_range_format = compile(r'^(\d+)\.\.(\d+)$')
@@ -177,6 +204,11 @@ parser.add_argument(
     '-f', '--force',
     help='overwrite existing results',
     action='store_true'
+)
+
+parser.add_argument(
+    '-p', '--params', help='path to params file',
+    metavar='<path>', type=Path
 )
 
 parser.add_argument(
