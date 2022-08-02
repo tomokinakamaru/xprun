@@ -2,7 +2,8 @@ from pathlib import Path
 from re import compile
 from sys import stdin
 from textwrap import indent
-from .argparser import ArgParser
+
+from xptools.argparser import ArgParser
 
 
 class Main(object):
@@ -24,9 +25,9 @@ class Main(object):
     def replace(self, lines, src, dst):
         for line in lines:
             d = dst
-            if '\n' in d:
+            if "\n" in d:
                 i = len(head_spaces.match(line).group(0))
-                d = indent(d, ' ' * i).strip()
+                d = indent(d, " " * i).strip()
             yield line.replace(src, d)
 
 
@@ -50,8 +51,8 @@ def xargs_expand(val):
 
 parser = ArgParser()
 
-xargs_format = compile(r'^(.+?)=(.*)$')
+xargs_format = compile(r"^(.+?)=(.*)$")
 
-xargs_file_format = compile(r'^@(.+)$')
+xargs_file_format = compile(r"^@(.+)$")
 
-head_spaces = compile(r'^\s*')
+head_spaces = compile(r"^\s*")

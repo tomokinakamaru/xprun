@@ -1,3 +1,1 @@
-# flake8: noqa
-from .utils import shell
-from .utils import xpfix
+from xptools.utils import shell, xpfix  # noqa: F401

@@ -1,11 +1,10 @@
-from argparse import ArgumentParser
-from argparse import HelpFormatter
+from argparse import ArgumentParser, HelpFormatter
 from shutil import get_terminal_size
 
 
 class ArgParser(ArgumentParser):
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault('formatter_class', Formatter)
+        kwargs.setdefault("formatter_class", Formatter)
         super().__init__(*args, **kwargs)
 
 

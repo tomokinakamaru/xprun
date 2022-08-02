@@ -1,14 +1,14 @@
 from argparse import Namespace
 from functools import cached_property
 from hashlib import md5
-from importlib.util import module_from_spec
-from importlib.util import spec_from_file_location
+from importlib.util import module_from_spec, spec_from_file_location
 from itertools import product
 from json import load
 from pathlib import Path
 from re import compile
 from shutil import rmtree
-from .argparser import ArgParser
+
+from xptools.argparser import ArgParser
 
 
 class Main(object):
@@ -31,14 +31,14 @@ class Main(object):
 
     @cached_property
     def outdir(self):
-        return self.args.outdir or self.args.script.with_suffix('')
+        return self.args.outdir or self.args.script.with_suffix("")
 
     def main(self):
-        for run_attrs in self.attrs('run'):
+        for run_attrs in self.attrs("run"):
             self.run(run_attrs)
-            for ext_attrs in self.attrs('ext'):
+            for ext_attrs in self.attrs("ext"):
                 self.extract(run_attrs, ext_attrs)
-        for vis_attrs in self.attrs('vis'):
+        for vis_attrs in self.attrs("vis"):
             self.visualize(vis_attrs)
 
     def run(self, attrs):
@@ -50,16 +50,15 @@ class Main(object):
             outdir.mkdir(parents=True)
             attrs_file.write_text(self.dump(attrs))
             self.script.run(Namespace(outdir=outdir, **attrs))
-            success_file.write_text('')
+            success_file.write_text("")
 
     def extract(self, run_attrs, ext_attrs):
         outdir = self.outdir / self.md5(run_attrs)
         ns = Namespace(outdir=outdir, **run_attrs, **ext_attrs)
         for label, value in self.script.extract(ns):
-            self.results.append(Result(
-                label=label, value=value,
-                **run_attrs, **ext_attrs
-            ))
+            self.results.append(
+                Result(label=label, value=value, **run_attrs, **ext_attrs)
+            )
 
     def visualize(self, attrs):
         ns = Namespace(outdir=self.outdir, **attrs)
@@ -75,10 +74,10 @@ class Main(object):
 
     def md5(self, dct):
         s = md5(str(sorted(dct.items())).encode()).hexdigest()
-        return f'{s[0]}/{s[1]}/{s[2:]}'
+        return f"{s[0]}/{s[1]}/{s[2:]}"
 
     def dump(self, dct):
-        return '\n'.join(f'{k} = {v}' for k, v in sorted(dct.items()))
+        return "\n".join(f"{k} = {v}" for k, v in sorted(dct.items()))
 
 
 class Results(list):
@@ -137,9 +136,9 @@ def xargs_parse_file(path):
     args = []
     with open(path) as f:
         data = load(f)
-        for step in ('run', 'ext', 'agg'):
+        for step in ("run", "ext", "agg"):
             for name, val in data.get(step, {}).items():
-                args.append(f'{step}:{name}={val}')
+                args.append(f"{step}:{name}={val}")
     return xargs_parse_args(args)
 
 
@@ -148,7 +147,7 @@ def xargs_parse_args(args):
     for arg in args:
         if match := xargs_format.match(arg):
             step, name, val = match.groups()
-            if name in ('label', 'outdir', 'value'):
+            if name in ("label", "outdir", "value"):
                 raise Exception(f'"{name}" is reserved')
             if name in names and names[name] != step:
                 raise Exception(f'Duplicate name "{name}"')
@@ -166,7 +165,7 @@ def xargs_expand(val):
         start, end = map(int, match.groups())
         yield from range(start, end + 1)
     else:
-        for text in val.split(','):
+        for text in val.split(","):
             for func in (int, float, str):
                 try:
                     yield func(text)
@@ -185,34 +184,26 @@ def xargs_merge(*xargs):
     return result
 
 
-xargs_format = compile(r'^(run|ext|vis):(.+?)=(.+?)$')
+xargs_format = compile(r"^(run|ext|vis):(.+?)=(.+?)$")
 
-xargs_range_format = compile(r'^(\d+)\.\.(\d+)$')
+xargs_range_format = compile(r"^(\d+)\.\.(\d+)$")
 
-attrs_file_name = '.attrs'
+attrs_file_name = ".attrs"
 
-success_file_name = '.success'
+success_file_name = ".success"
 
 parser = ArgParser()
 
+parser.add_argument("script", help="path to script", metavar="<script>", type=Path)
+
 parser.add_argument(
-    'script', help='path to script',
-    metavar='<script>', type=Path
+    "-f", "--force", help="overwrite existing results", action="store_true"
 )
 
 parser.add_argument(
-    '-f', '--force',
-    help='overwrite existing results',
-    action='store_true'
+    "-p", "--params", help="path to params file", metavar="<path>", type=Path
 )
 
 parser.add_argument(
-    '-p', '--params', help='path to params file',
-    metavar='<path>', type=Path
-)
-
-parser.add_argument(
-    '-o', '--outdir',
-    help='path to output',
-    metavar='<outdir>', type=Path
+    "-o", "--outdir", help="path to output", metavar="<outdir>", type=Path
 )
