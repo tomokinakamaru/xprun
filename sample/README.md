@@ -1,6 +1,6 @@
 # Sample experiments
 
-## sample1.py
+## for-loop performance check
 
 ```sh
 xprun -p sample/forloop-perf.json sample/forloop-perf.py
