@@ -1,8 +1,6 @@
 PYTHON := python3
 
-override src = xptools
-
-override test_deps =
+override src = xptools sample
 
 override venv = venv
 
@@ -12,15 +10,20 @@ override pip = $(bin)/pip
 
 override python = $(bin)/python
 
+override installed = $(venv)/.installed
+
 # -----------------------------------------------------------------------------
 .PHONY: setup
 setup: install
 
 .PHONY: setup-dev
-setup-dev: setup $(bin)/flake8 $(bin)/mypy vscode
+setup-dev: setup $(bin)/flake8 vscode
 
 .PHONY: check
-check: flake8 mypy
+check: isort black flake8
+
+.PHONY: format
+format: isort-apply black-apply
 
 .PHONY: clean
 clean: $(shell grep -o '^clean-[^:]*' Makefile)
@@ -33,13 +36,13 @@ clean-pyc:
 
 # install ---------------------------------------------------------------------
 .PHONY: install
-install: $(venv)/.installed
+install: $(installed)
 
 .PHONY: clean-install
 clean-install:
-	rm -rf $(venv)/.installed build *.egg-info
+	rm -rf $(installed) build *.egg-info
 
-$(venv)/.installed: $(pip)
+$(installed): $(pip)
 	$< install -e . && touch $@
 
 $(pip): $(python)
@@ -50,23 +53,35 @@ $(python):
 
 # flake8 ----------------------------------------------------------------------
 .PHONY: flake8
-flake8: $(bin)/flake8
+flake8: $(bin)/flake8 $(installed)
 	$< setup.py $(src)
 
 $(bin)/flake8: $(pip)
-	$< install flake8
+	$< install flake8 flake8-black flake8-tidy-imports
 
-# mypy ------------------------------------------------------------------------
-.PHONY: mypy
-mypy: $(bin)/mypy
+# black -----------------------------------------------------------------------
+.PHONY: black
+black: $(bin)/black $(installed)
+	$< --quiet --check setup.py $(src)
+
+.PHONY: black-apply
+black-apply: $(bin)/black $(installed)
+	$< --quiet setup.py $(src)
+
+$(bin)/black: $(pip)
+	$< install black
+
+# isort -----------------------------------------------------------------------
+.PHONY: isort
+isort: $(bin)/isort $(installed)
+	$< --check-only setup.py $(src)
+
+.PHONY: isort-apply
+isort-apply: $(bin)/isort $(installed)
 	$< setup.py $(src)
 
-.PHONY: clean-mypy
-clean-mypy:
-	rm -rf .mypy_cache
-
-$(bin)/mypy: $(pip)
-	$< install mypy
+$(bin)/isort: $(pip)
+	$< install isort
 
 # vscode ----------------------------------------------------------------------
 .PHONY: vscode
@@ -85,6 +100,6 @@ clean-vscode:
 .vscode/settings.json: | .vscode
 	echo '{' > $@
 	echo '  "python.linting.flake8Enabled": true,' >> $@
-	echo '  "python.linting.mypyEnabled": true,' >> $@
 	echo '  "python.defaultInterpreterPath": "$(python)"' >> $@
+	echo '  "explorer.excludeGitIgnore": true' >> $@
 	echo '}' >> $@
