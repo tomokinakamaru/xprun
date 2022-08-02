@@ -3,6 +3,6 @@
 ## sample1.py
 
 ```sh
-xprun -p sample/sample1.json sample/sample1.py
-# => check sample/sample1/result.txt
+xprun -p sample/forloop-perf.json sample/forloop-perf.py
+# => check sample/forloop-perf/result.txt
 ```

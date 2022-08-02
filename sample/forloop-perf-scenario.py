@@ -8,4 +8,4 @@ start = time()
 for _ in range(10**__size__):
     pass
 
-Path('__outdir__/time.txt').write_text(str(time() - start))
+Path("__outdir__/time.txt").write_text(str(time() - start))
