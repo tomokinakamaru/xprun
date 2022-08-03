@@ -40,7 +40,7 @@ def xpfix(src, dst=None, begin=None, end=None, **kwargs):
         if v is not None:
             lst = v if isinstance(v, (list, tuple)) else [v]
             for e in lst:
-                args.extend([f"--{k}", str(e)])
+                args.extend([f"--{k}", quote(str(e))])
 
     for k, v in kwargs.items():
         lst = v if isinstance(v, (list, tuple)) else [v]
