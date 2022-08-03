@@ -1,4 +1,5 @@
 from pathlib import Path
+from shlex import quote
 from subprocess import PIPE, STDOUT, run
 
 
@@ -16,5 +17,5 @@ def shell(*command, debug=False, **environ):
 def xpfix(src, dst=None, **kwargs):
     src = Path(src)
     dst = dst or src.parent / f".{src.name}"
-    shell("xpfix", *(f"'{k}={v}'" for k, v in kwargs.items()), "<", src, ">", dst)
+    shell("xpfix", *(quote(f"{k}={v}") for k, v in kwargs.items()), "<", src, ">", dst)
     return dst
