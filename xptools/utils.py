@@ -1,6 +1,18 @@
+from inspect import currentframe
 from pathlib import Path
 from shlex import quote
 from subprocess import PIPE, STDOUT, run
+
+from xptools.run import Attrs
+
+
+def find_attrs():
+    frame = currentframe().f_back
+    while frame:
+        for v in frame.f_locals.values():
+            if isinstance(v, Attrs):
+                return v
+        frame = frame.f_back
 
 
 def shell(*command, debug=False, **environ):

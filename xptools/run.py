@@ -49,20 +49,20 @@ class Main(object):
             outdir.exists() and rmtree(outdir)
             outdir.mkdir(parents=True)
             attrs_file.write_text(self.dump(attrs))
-            self.script.run(Namespace(outdir=outdir, **attrs))
+            self.script.run(Attrs(outdir=outdir, **attrs))
             success_file.write_text("")
 
     def extract(self, run_attrs, ext_attrs):
         outdir = self.outdir / self.md5(run_attrs)
-        ns = Namespace(outdir=outdir, **run_attrs, **ext_attrs)
-        for label, value in self.script.extract(ns):
+        attrs = Attrs(outdir=outdir, **run_attrs, **ext_attrs)
+        for label, value in self.script.extract(attrs):
             self.results.append(
                 Result(label=label, value=value, **run_attrs, **ext_attrs)
             )
 
     def visualize(self, attrs):
-        ns = Namespace(outdir=self.outdir, **attrs)
-        self.script.visualize(self.results, ns)
+        attrs = Attrs(outdir=self.outdir, **attrs)
+        self.script.visualize(self.results, attrs)
 
     def attrs(self, step):
         if dct := self.xargs.get(step):
@@ -78,6 +78,10 @@ class Main(object):
 
     def dump(self, dct):
         return "\n".join(f"{k} = {v}" for k, v in sorted(dct.items()))
+
+
+class Attrs(Namespace):
+    pass
 
 
 class Results(list):
