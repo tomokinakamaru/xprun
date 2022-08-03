@@ -26,12 +26,17 @@ def shell(*command, debug=False, **environ):
         exit(1)
 
 
-def xpfix(src, dst=None, **kwargs):
+def xpfix(src, dst=None, begin=None, end=None, **kwargs):
     src = Path(src)
     if dst is None:
         if attrs := find_attrs():
             dst = attrs.outdir / src.name
         else:
             dst = src.parent / f".{src.name}"
-    shell("xpfix", *(quote(f"{k}={v}") for k, v in kwargs.items()), "<", src, ">", dst)
+
+    args = []
+    args += ["--begin", begin] if begin else []
+    args += ["--end", end] if end else []
+    args.extend(quote(f"{k}={v}") for k, v in kwargs.items())
+    shell("xpfix", *args, "<", src, ">", dst)
     return dst

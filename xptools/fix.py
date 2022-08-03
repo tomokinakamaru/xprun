@@ -19,8 +19,12 @@ class Main(object):
         lines = stdin.read().splitlines()
         for src, dst in self.xargs.items():
             lines = self.replace(lines, src, dst)
+        if self.args.begin:
+            print(self.args.begin)
         for line in lines:
             print(line)
+        if self.args.end:
+            print(self.args.end)
 
     def replace(self, lines, src, dst):
         for line in lines:
@@ -50,6 +54,10 @@ def xargs_expand(val):
 
 
 parser = ArgParser()
+
+parser.add_argument("--begin", help="insert <text> at beginning", metavar="<text>")
+
+parser.add_argument("--end", help="insert <text> at end", metavar="<text>")
 
 xargs_file_format = compile(r"^@(.+)$")
 
