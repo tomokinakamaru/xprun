@@ -16,15 +16,14 @@ class Main(object):
         self.xargs = xargs_parse(unknown)
 
     def main(self):
-        lines = stdin.read().splitlines()
+        lines = []
+        lines += self.args.begin.splitlines() if self.args.begin else []
+        lines += stdin.read().splitlines()
+        lines += self.args.end.splitlines() if self.args.end else []
         for src, dst in self.xargs.items():
             lines = self.replace(lines, src, "\n".join(dst))
-        if self.args.begin:
-            print(self.args.begin)
         for line in lines:
             print(line)
-        if self.args.end:
-            print(self.args.end)
 
     def replace(self, lines, src, dst):
         for line in lines:
