@@ -1,1 +1,1 @@
-from xptools.utils import shell, xpfix  # noqa: F401
+from xptools.utils import find_attrs, shell, xpfix  # noqa: F401
