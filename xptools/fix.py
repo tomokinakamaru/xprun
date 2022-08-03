@@ -18,7 +18,7 @@ class Main(object):
     def main(self):
         lines = stdin.read().splitlines()
         for src, dst in self.xargs.items():
-            lines = self.replace(lines, src, dst)
+            lines = self.replace(lines, src, "\n".join(dst))
         if self.args.begin:
             print(self.args.begin)
         for line in lines:
@@ -40,7 +40,8 @@ def xargs_parse(args):
     for arg in args:
         if "=" in arg:
             src, dst = arg.split("=", 1)
-            xargs[src] = xargs_expand(dst)
+            xargs.setdefault(src, [])
+            xargs[src].append(xargs_expand(dst))
         else:
             raise Exception(f'Invalid xarg "{arg}"')
     return xargs

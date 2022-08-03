@@ -37,6 +37,11 @@ def xpfix(src, dst=None, begin=None, end=None, **kwargs):
     args = []
     args += ["--begin", begin] if begin else []
     args += ["--end", end] if end else []
-    args.extend(quote(f"{k}={v}") for k, v in kwargs.items())
+
+    for k, v in kwargs.items():
+        lst = v if isinstance(v, (list, tuple)) else [v]
+        for e in lst:
+            args.append(quote(f"{k}={e}"))
+
     shell("xpfix", *args, "<", src, ">", dst)
     return dst
