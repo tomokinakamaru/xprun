@@ -28,6 +28,10 @@ def shell(*command, debug=False, **environ):
 
 def xpfix(src, dst=None, **kwargs):
     src = Path(src)
-    dst = dst or src.parent / f".{src.name}"
+    if dst is None:
+        if attrs := find_attrs():
+            dst = attrs.outdir / src.name
+        else:
+            dst = src.parent / f".{src.name}"
     shell("xpfix", *(quote(f"{k}={v}") for k, v in kwargs.items()), "<", src, ">", dst)
     return dst
