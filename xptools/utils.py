@@ -35,8 +35,11 @@ def xpfix(src, dst=None, begin=None, end=None, **kwargs):
             dst = src.parent / f".{src.name}"
 
     args = []
-    args += ["--begin", begin] if begin else []
-    args += ["--end", end] if end else []
+
+    for k, v in {"begin": begin, "end": end}.items():
+        lst = v if isinstance(v, (list, tuple)) else [v]
+        for e in lst:
+            args.extend([f"--{k}", str(e)])
 
     for k, v in kwargs.items():
         lst = v if isinstance(v, (list, tuple)) else [v]
