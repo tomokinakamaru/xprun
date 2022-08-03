@@ -2,13 +2,14 @@ from pathlib import Path
 from subprocess import PIPE, STDOUT, run
 
 
-def shell(*args, **kwargs):
-    command = " ".join((*(f"{k}={v}" for k, v in kwargs.items()), *map(str, args)))
-    print(f"[shell] {command}")
-    process = run(command, shell=True, text=True, stdout=PIPE, stderr=STDOUT)
+def shell(*command, debug=False, **environ):
+    args = " ".join((*(f"{k}={v}" for k, v in environ.items()), *map(str, command)))
+    stdout = None if debug else PIPE
+    print(f"[shell] {args}")
+    process = run(args, shell=True, text=True, stdout=stdout, stderr=STDOUT)
     if process.returncode:
-        output = process.stdout.strip()
-        output and print(output)
+        output = process.stdout
+        output and print(output.strip())
         exit(1)
 
 
