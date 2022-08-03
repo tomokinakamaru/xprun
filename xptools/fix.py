@@ -34,8 +34,8 @@ class Main(object):
 def xargs_parse(args):
     xargs = {}
     for arg in args:
-        if match := xargs_format.match(arg):
-            src, dst = match.groups()
+        if "=" in arg:
+            src, dst = arg.split("=", 1)
             xargs[src] = xargs_expand(dst)
         else:
             raise Exception(f'Invalid xarg "{arg}"')
@@ -50,8 +50,6 @@ def xargs_expand(val):
 
 
 parser = ArgParser()
-
-xargs_format = compile(r"^(.+?)=(.*)$")
 
 xargs_file_format = compile(r"^@(.+)$")
 
