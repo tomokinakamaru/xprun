@@ -20,7 +20,7 @@ setup: install
 setup-dev: setup $(bin)/flake8 vscode
 
 .PHONY: check
-check: isort black flake8
+check: isort black flake8 coverage
 
 .PHONY: format
 format: isort-apply black-apply
