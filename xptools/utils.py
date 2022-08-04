@@ -1,7 +1,7 @@
 from inspect import currentframe
 from pathlib import Path
 from shlex import quote
-from subprocess import PIPE, STDOUT, run
+from subprocess import run
 
 from xptools.run import Attrs
 
@@ -15,14 +15,11 @@ def find_attrs():
         frame = frame.f_back
 
 
-def shell(*command, debug=False, **environ):
+def shell(*command, **environ):
     args = " ".join((*(f"{k}={v}" for k, v in environ.items()), *map(str, command)))
-    stdout = None if debug else PIPE
-    print(f"[shell] {args}")
-    process = run(args, shell=True, text=True, stdout=stdout, stderr=STDOUT)
+    print(args)
+    process = run(args, shell=True, text=True)
     if process.returncode:
-        output = process.stdout
-        output and print(output.strip())
         exit(1)
 
 
