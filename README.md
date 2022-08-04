@@ -1,7 +1,15 @@
-# XPTools
+# XPTools - Tools for experiments
 
-## Workflow
+## Installation
 
-1. Create experiment script (See [sample/forloop-perf.py](sample/forloop-perf.py))
-1. Define experiment parameters (See [sample/forloop-perf.json](sample/forloop-perf.json))
-1. Run `xprun <experiment-script>` (See [sample/README.md](sample/README.md))
+```sh
+pip install git+https://github.com/tomokinakamaru/xptools@<commit-hash>
+```
+
+## Usage
+
+1. Create experiment script.
+1. Define experiment parameters in the JSON format.
+1. Run `xprun -p <params-file> <expr-script>`.
+
+See [sample](./sample) for more information.
