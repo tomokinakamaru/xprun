@@ -1,6 +1,6 @@
 PYTHON := python3
 
-override src = xptools sample
+override src = xptools
 
 override venv = venv
 
@@ -51,10 +51,30 @@ $(pip): $(python)
 $(python):
 	$(PYTHON) -m venv $(venv) --without-pip
 
+# test/coverage ---------------------------------------------------------------
+.PHONY: test
+test: $(bin)/pytest $(installed)
+	$<
+
+.PHONY: coverage
+coverage: $(bin)/pytest $(installed)
+	$< --cov $(src) --cov-report=term --cov-report=html --cov-report=xml
+
+.PHONY: clean-test
+clean-test:
+	rm -rf .pytest_cache
+
+.PHONY: clean-coverage
+clean-coverage:
+	rm -rf .coverage coverage.xml htmlcov
+
+$(bin)/pytest: $(pip)
+	$< install pytest-cov pytest-asyncio pytest-timeout
+
 # flake8 ----------------------------------------------------------------------
 .PHONY: flake8
 flake8: $(bin)/flake8 $(installed)
-	$< setup.py $(src)
+	$< setup.py $(src) sample tests
 
 $(bin)/flake8: $(pip)
 	$< install flake8 flake8-black flake8-tidy-imports
@@ -62,11 +82,11 @@ $(bin)/flake8: $(pip)
 # black -----------------------------------------------------------------------
 .PHONY: black
 black: $(bin)/black $(installed)
-	$< --quiet --check setup.py $(src)
+	$< --quiet --check setup.py $(src) sample tests
 
 .PHONY: black-apply
 black-apply: $(bin)/black $(installed)
-	$< --quiet setup.py $(src)
+	$< --quiet setup.py $(src) sample tests
 
 $(bin)/black: $(pip)
 	$< install black
@@ -74,11 +94,11 @@ $(bin)/black: $(pip)
 # isort -----------------------------------------------------------------------
 .PHONY: isort
 isort: $(bin)/isort $(installed)
-	$< --check-only setup.py $(src)
+	$< --check-only setup.py $(src) sample tests
 
 .PHONY: isort-apply
 isort-apply: $(bin)/isort $(installed)
-	$< setup.py $(src)
+	$< setup.py $(src) sample tests
 
 $(bin)/isort: $(pip)
 	$< install isort
