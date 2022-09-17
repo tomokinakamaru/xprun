@@ -4,16 +4,15 @@ from shlex import quote
 from subprocess import run
 from sys import executable
 
-from xptools.run import Attrs
+from xptools.run import Attrs, Results
 
 
 def find_attrs():
-    frame = currentframe().f_back
-    while frame:
-        for v in frame.f_locals.values():
-            if isinstance(v, Attrs):
-                return v
-        frame = frame.f_back
+    return _find_object(Attrs)
+
+
+def find_results():
+    return _find_object(Results)
 
 
 def shell(*command, **environ):
@@ -47,3 +46,12 @@ def xpfix(src, dst=None, begin=None, end=None, **kwargs):
 
     shell(Path(executable).parent / "xpfix", *args, "<", src, ">", dst)
     return dst
+
+
+def _find_object(cls):
+    frame = currentframe().f_back
+    while frame:
+        for v in frame.f_locals.values():
+            if isinstance(v, cls):
+                return v
+        frame = frame.f_back

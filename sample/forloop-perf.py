@@ -3,6 +3,7 @@ from statistics import median
 from sys import executable
 
 from xptools import shell, xpfix
+from xptools.utils import find_attrs, find_results
 
 
 def execute(attrs):
@@ -22,12 +23,17 @@ def extract(attrs):
         raise Exception()
 
 
-def visualize(data, attrs):
+def visualize(results, attrs):
     for label in ("s", "ms"):
-        filtered = data.filter(label=label)
-        filtered = filtered.group("size")
-        filtered = filtered.apply(lambda rs: median(r.value for r in rs))
-        path = attrs.outdir / f"{attrs.name}-{label}.txt"
-        with open(path, "w") as f:
-            for size, val in filtered.items():
-                print(f"10^{size}: {val:.2e}{label}", file=f)
+        _visualize(label)
+
+
+def _visualize(label):
+    results, attrs = find_results(), find_attrs()
+    filtered = results.filter(label=label)
+    filtered = filtered.group("size")
+    filtered = filtered.apply(lambda rs: median(r.value for r in rs))
+    path = attrs.outdir / f"{attrs.name}-{label}.txt"
+    with open(path, "w") as f:
+        for size, val in filtered.items():
+            print(f"10^{size}: {val:.2e}{label}", file=f)
