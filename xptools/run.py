@@ -34,14 +34,14 @@ class Main(object):
         return self.args.outdir or self.args.script.with_suffix("")
 
     def main(self):
-        for run_attrs in self.attrs("run"):
-            self.run(run_attrs)
+        for exe_attrs in self.attrs("exe"):
+            self.execute(exe_attrs)
             for ext_attrs in self.attrs("ext"):
-                self.extract(run_attrs, ext_attrs)
+                self.extract(exe_attrs, ext_attrs)
         for vis_attrs in self.attrs("vis"):
             self.visualize(vis_attrs)
 
-    def run(self, attrs):
+    def execute(self, attrs):
         outdir = self.outdir / self.md5(attrs)
         success_file = outdir / success_file_name
         if self.args.force or not success_file.exists():
@@ -49,16 +49,15 @@ class Main(object):
             outdir.exists() and rmtree(outdir)
             outdir.mkdir(parents=True)
             attrs_file.write_text(self.dump(attrs))
-            self.script.run(Attrs(outdir=outdir, **attrs))
+            self.script.execute(Attrs(outdir=outdir, **attrs))
             success_file.write_text("")
 
-    def extract(self, run_attrs, ext_attrs):
-        outdir = self.outdir / self.md5(run_attrs)
-        attrs = Attrs(outdir=outdir, **run_attrs, **ext_attrs)
+    def extract(self, exe_attrs, ext_attrs):
+        outdir = self.outdir / self.md5(exe_attrs)
+        attrs = Attrs(outdir=outdir, **exe_attrs, **ext_attrs)
         for label, value in self.script.extract(attrs):
-            self.results.append(
-                Result(label=label, value=value, **run_attrs, **ext_attrs)
-            )
+            r = Result(label=label, value=value, **exe_attrs, **ext_attrs)
+            self.results.append(r)
 
     def visualize(self, attrs):
         attrs = Attrs(outdir=self.outdir, **attrs)
@@ -140,7 +139,7 @@ def xargs_parse_file(path):
     args = []
     with open(path) as f:
         data = load(f)
-        for step in ("run", "ext", "vis"):
+        for step in ("exe", "ext", "vis"):
             for name, val in data.get(step, {}).items():
                 args.append(f"{step}:{name}={val}")
     return xargs_parse_args(args)
@@ -188,7 +187,7 @@ def xargs_merge(*xargs):
     return result
 
 
-xargs_format = compile(r"^(run|ext|vis):(.+?)=(.+?)$")
+xargs_format = compile(r"^(exe|ext|vis):(.+?)=(.+?)$")
 
 xargs_range_format = compile(r"^(\d+)\.\.(\d+)$")
 

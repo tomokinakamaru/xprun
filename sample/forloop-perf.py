@@ -5,7 +5,7 @@ from sys import executable
 from xptools import shell, xpfix
 
 
-def run(attrs):
+def execute(attrs):
     path = Path(__file__).parent / "forloop-perf-scenario.py"
     scenario = xpfix(path, __size__=attrs.size, __outdir__=attrs.outdir)
     shell(executable, scenario)
