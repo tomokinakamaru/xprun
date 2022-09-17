@@ -2,6 +2,7 @@ from inspect import currentframe
 from pathlib import Path
 from shlex import quote
 from subprocess import run
+from sys import executable
 
 from xptools.run import Attrs
 
@@ -44,5 +45,5 @@ def xpfix(src, dst=None, begin=None, end=None, **kwargs):
         for e in lst:
             args.append(quote(f"{k}={e}"))
 
-    shell("xpfix", *args, "<", src, ">", dst)
+    shell(Path(executable).parent / "xpfix", *args, "<", src, ">", dst)
     return dst
