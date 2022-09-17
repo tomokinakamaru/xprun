@@ -140,7 +140,7 @@ def xargs_parse_file(path):
     args = []
     with open(path) as f:
         data = load(f)
-        for step in ("run", "ext", "agg"):
+        for step in ("run", "ext", "vis"):
             for name, val in data.get(step, {}).items():
                 args.append(f"{step}:{name}={val}")
     return xargs_parse_args(args)
