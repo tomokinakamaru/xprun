@@ -7,6 +7,7 @@ from json import load
 from pathlib import Path
 from re import compile
 from shutil import rmtree
+from traceback import print_exc
 
 from xptools.argparser import ArgParser
 
@@ -35,9 +36,9 @@ class Main(object):
 
     def main(self):
         for exe_attrs in self.attrs("exe"):
-            self.execute(exe_attrs)
-            for ext_attrs in self.attrs("ext"):
-                self.extract(exe_attrs, ext_attrs)
+            if self.execute(exe_attrs):
+                for ext_attrs in self.attrs("ext"):
+                    self.extract(exe_attrs, ext_attrs)
         for vis_attrs in self.attrs("vis"):
             self.visualize(vis_attrs)
 
@@ -49,8 +50,17 @@ class Main(object):
             outdir.exists() and rmtree(outdir)
             outdir.mkdir(parents=True)
             attrs_file.write_text(self.dump(attrs))
-            self.script.execute(Attrs(outdir=outdir, **attrs))
-            success_file.write_text("")
+            try:
+                self.script.execute(Attrs(outdir=outdir, **attrs))
+            except Exception:
+                if self.args.continue_:
+                    print_exc()
+                    return False
+                else:
+                    raise
+            else:
+                success_file.write_text("")
+        return True
 
     def extract(self, exe_attrs, ext_attrs):
         outdir = self.outdir / self.md5(exe_attrs)
@@ -200,13 +210,32 @@ parser = ArgParser()
 parser.add_argument("script", help="path to script", metavar="<script>", type=Path)
 
 parser.add_argument(
-    "-f", "--force", help="overwrite existing results", action="store_true"
+    "-f",
+    "--force",
+    help="overwrite existing results",
+    action="store_true",
 )
 
 parser.add_argument(
-    "-p", "--params", help="path to params file", metavar="<path>", type=Path
+    "-p",
+    "--params",
+    help="path to params file",
+    metavar="<path>",
+    type=Path,
 )
 
 parser.add_argument(
-    "-o", "--outdir", help="path to output", metavar="<outdir>", type=Path
+    "-c",
+    "--continue",
+    help="continue execution on error",
+    action="store_true",
+    dest="continue_",
+)
+
+parser.add_argument(
+    "-o",
+    "--outdir",
+    help="path to output",
+    metavar="<outdir>",
+    type=Path,
 )
