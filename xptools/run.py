@@ -217,19 +217,19 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "-p",
-    "--params",
-    help="path to params file",
-    metavar="<path>",
-    type=Path,
-)
-
-parser.add_argument(
     "-c",
     "--continue",
     help="continue execution on error",
     action="store_true",
     dest="continue_",
+)
+
+parser.add_argument(
+    "-p",
+    "--params",
+    help="path to params file",
+    metavar="<path>",
+    type=Path,
 )
 
 parser.add_argument(
