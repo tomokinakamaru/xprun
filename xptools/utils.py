@@ -1,7 +1,7 @@
 from inspect import currentframe
 from pathlib import Path
 from shlex import quote
-from subprocess import run
+from subprocess import check_call
 from sys import executable
 
 from xptools.run import Attrs, Results
@@ -18,9 +18,7 @@ def find_results():
 def shell(*command, **environ):
     args = " ".join((*(f"{k}={v}" for k, v in environ.items()), *map(str, command)))
     print(args)
-    process = run(args, shell=True, text=True)
-    if process.returncode:
-        exit(1)
+    check_call(args, shell=True, text=True)
 
 
 def xpfix(src, dst=None, begin=None, end=None, **kwargs):
