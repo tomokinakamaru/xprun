@@ -151,6 +151,7 @@ def xargs_parse_file(path):
         data = load(f)
         for step in ("exe", "ext", "vis"):
             for name, val in data.get(step, {}).items():
+                val = ",".join(val) if isinstance(val, list) else val
                 args.append(f"{step}:{name}={val}")
     return xargs_parse_args(args)
 
