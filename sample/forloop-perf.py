@@ -1,15 +1,18 @@
 from pathlib import Path
 from statistics import median
+from subprocess import check_call
 from sys import executable
-
-from xptools import shell, xpfix
-from xptools.utils import find_attrs, find_results
 
 
 def execute(attrs):
-    path = Path(__file__).parent / "forloop-perf-scenario.py"
-    scenario = xpfix(path, __size__=attrs.size, __outdir__=attrs.outdir)
-    shell(executable, scenario)
+    name = "forloop-perf-scenario.py"
+    path = Path(__file__).parent / name
+    dest = attrs.outdir / name
+    code = path.read_text()
+    code = code.replace("__size__", str(attrs.size))
+    code = code.replace("__outdir__", str(attrs.outdir))
+    dest.write_text(code)
+    check_call([executable, dest])
 
 
 def extract(attrs):
@@ -23,14 +26,13 @@ def extract(attrs):
         raise Exception()
 
 
-def visualize(results, attrs):
+def visualize(data, attrs):
     for label in ("s", "ms"):
-        _visualize(label)
+        _visualize(label, data, attrs)
 
 
-def _visualize(label):
-    results, attrs = find_results(), find_attrs()
-    filtered = results.filter(label=label)
+def _visualize(label, data, attrs):
+    filtered = data.filter(label=label)
     filtered = filtered.group("size")
     filtered = filtered.apply(lambda rs: median(r.value for r in rs))
     path = attrs.outdir / f"{attrs.name}-{label}.txt"

@@ -1,9 +1,10 @@
 from pathlib import Path
+from subprocess import check_call
 from sys import executable
-
-from xptools.utils import shell
 
 
 def test_xprun():
-    xprun = Path(executable).parent / "xprun"
-    shell(xprun, "-f", "-p", "sample/forloop-perf.json", "sample/forloop-perf.py")
+    xprun = str(Path(executable).parent / "xprun")
+    params = "sample/forloop-perf.json"
+    script = "sample/forloop-perf.py"
+    check_call([xprun, "-f", "-p", params, script])
