@@ -65,9 +65,15 @@ class Main(object):
     def extract(self, exe_attrs, ext_attrs):
         outdir = self.outdir / self.md5(exe_attrs)
         attrs = Attrs(outdir=outdir, **exe_attrs, **ext_attrs)
-        for label, value in self.script.extract(attrs):
-            r = Result(label=label, value=value, **exe_attrs, **ext_attrs)
-            self.results.append(r)
+        try:
+            for label, value in self.script.extract(attrs):
+                r = Result(label=label, value=value, **exe_attrs, **ext_attrs)
+                self.results.append(r)
+        except Exception:
+            if self.args.continue_:
+                print_exc()
+            else:
+                raise
 
     def visualize(self, attrs):
         attrs = Attrs(outdir=self.outdir, **attrs)
