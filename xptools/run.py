@@ -19,7 +19,7 @@ class Main(object):
 
     def __init__(self):
         self.args, unknown = parser.parse_known_args()
-        self.xargs = xargs_parse(unknown, self.args.params)
+        self.xargs = xargs_parse(unknown, self.args.parameters)
         self.results = Results()
 
     @cached_property
@@ -227,7 +227,7 @@ parser.add_argument(
 
 parser.add_argument(
     "-p",
-    "--params",
+    "--parameters",
     help="path to params file",
     metavar="<path>",
     type=Path,
