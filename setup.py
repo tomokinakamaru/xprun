@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-name = "xptools"
+name = "xprun"
 
 setup(
     name=name,

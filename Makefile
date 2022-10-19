@@ -1,6 +1,6 @@
 PYTHON := python3
 
-override src = xptools
+override src = xprun
 
 override venv = venv
 

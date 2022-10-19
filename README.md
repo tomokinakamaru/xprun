@@ -3,7 +3,7 @@
 ## Installation
 
 ```sh
-pip install git+https://github.com/tomokinakamaru/xptools#<commit-hash>
+pip install git+https://github.com/tomokinakamaru/xprun#<commit-hash>
 ```
 
 ## Usage

@@ -10,7 +10,7 @@ from re import compile
 from shutil import rmtree
 from traceback import print_exc
 
-from xptools.argparser import ArgParser
+from xprun.argparser import ArgParser
 
 
 class Main(object):
