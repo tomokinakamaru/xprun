@@ -1,4 +1,4 @@
-# XPTools - Tools for experiments
+# xprun
 
 ## Installation
 
