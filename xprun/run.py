@@ -1,3 +1,4 @@
+import sys
 from argparse import Namespace
 from concurrent.futures import ProcessPoolExecutor
 from functools import cached_property
@@ -36,6 +37,8 @@ class Main(object):
         return self.args.outdir or self.args.script.with_suffix("")
 
     def main(self):
+        script_dir = str(self.args.script.parent.absolute())
+        sys.path.append(script_dir)
         with ProcessPoolExecutor(self.args.jobs) as ppe:
             for success, exe_attrs in ppe.map(self.execute, self.attrs("exe")):
                 if success:
@@ -43,6 +46,7 @@ class Main(object):
                         self.extract(exe_attrs, ext_attrs)
         for vis_attrs in self.attrs("vis"):
             self.visualize(vis_attrs)
+        sys.path.remove(script_dir)
 
     def execute(self, attrs):
         outdir = self.outdir / self.md5(attrs)
