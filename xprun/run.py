@@ -1,6 +1,5 @@
 import sys
 from argparse import Namespace
-from concurrent.futures import ProcessPoolExecutor
 from functools import cached_property
 from hashlib import md5
 from importlib.util import module_from_spec, spec_from_file_location
@@ -24,7 +23,7 @@ class Main(object):
         self.xargs = xargs_parse(unknown, self.args.parameters)
         self.results = Results()
 
-    @property
+    @cached_property
     def script(self):
         p = self.args.script
         s = spec_from_file_location(p.stem, p)
@@ -39,11 +38,10 @@ class Main(object):
     def main(self):
         script_dir = str(self.args.script.parent.absolute())
         sys.path.append(script_dir)
-        with ProcessPoolExecutor(self.args.jobs) as ppe:
-            for success, exe_attrs in ppe.map(self.execute, self.attrs("exe")):
-                if success:
-                    for ext_attrs in self.attrs("ext"):
-                        self.extract(exe_attrs, ext_attrs)
+        for exe_attrs in self.attrs("exe"):
+            if self.execute(exe_attrs):
+                for ext_attrs in self.attrs("ext"):
+                    self.extract(exe_attrs, ext_attrs)
         for vis_attrs in self.attrs("vis"):
             self.visualize(vis_attrs)
         sys.path.remove(script_dir)
@@ -61,12 +59,12 @@ class Main(object):
             except Exception:
                 if self.args.continue_:
                     print_exc()
-                    return False, attrs
+                    return False
                 else:
                     raise
             else:
                 success_file.write_text("")
-        return True, attrs
+        return True
 
     def extract(self, exe_attrs, ext_attrs):
         outdir = self.outdir / self.md5(exe_attrs)
@@ -235,15 +233,6 @@ parser.add_argument(
     help="continue execution on error",
     action="store_true",
     dest="continue_",
-)
-
-parser.add_argument(
-    "-j",
-    "--jobs",
-    help="# of jobs executed at once",
-    metavar="<n>",
-    default=1,
-    type=int,
 )
 
 parser.add_argument(
