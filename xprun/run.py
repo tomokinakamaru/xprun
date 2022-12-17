@@ -33,7 +33,10 @@ class Main(object):
 
     @cached_property
     def outdir(self):
-        return self.args.outdir or self.args.script.with_suffix("")
+        if self.args.outdir:
+            return self.args.outdir
+        path = self.args.script.with_suffix("")
+        return path.parent / f".{path.name}"
 
     def main(self):
         script_dir = str(self.args.script.parent.absolute())
