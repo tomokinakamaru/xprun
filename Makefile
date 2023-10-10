@@ -1,6 +1,6 @@
 PYTHON = python3
 
-override src = src
+override src = xprun.py
 
 override tests = tests
 

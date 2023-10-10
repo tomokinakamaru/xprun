@@ -1,16 +1,6 @@
-from setuptools import find_packages, setup
-
-pkgs = find_packages("src")
-
-name = pkgs[0]
+from setuptools import setup
 
 setup(
-    entry_points={
-        "console_scripts": [
-            f"xprun={name}.run:Main.entrypoint",
-        ],
-    },
-    name=name,
-    packages=pkgs,
-    package_dir={"": "src"},
+    entry_points={"console_scripts": ["xprun=xprun.run:Main.entrypoint"]},
+    name="xprun",
 )
